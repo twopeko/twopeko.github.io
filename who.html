@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Search</title>
+</head>
+<body>
+  <h1>Image Search</h1>
+  <input type="text" id="search-query">
+  <button onclick="searchImages()">Search</button>
+  <h2>
+  <div id="image-container"></div>
+
+  <script>
+    function searchImages() {
+      const query = document.getElementById('search-query').value;
+      const apiKey = 'AIzaSyDYZKa0WVjGQLK0OYjE6vxtqrgufHyHmCg';
+      const cx = '517a5defcdd94428d';
+      const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${query}&searchType=image`;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const image = data.items[0].link;
+          const imageContainer = document.getElementById('image-container');
+          imageContainer.innerHTML = `<img src="${image}" alt="${query}" style="max-width: 400px; max-height: 400px; width: auto; height: auto;">`;
+        })
+        .catch(error => console.error(error));
+    }
+  </script>
+</body>
+</html>
