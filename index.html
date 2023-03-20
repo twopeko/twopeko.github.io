@@ -2,62 +2,63 @@
 <html>
 <head>
   <title>Image Search</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-    }
-    h1 {
-      font-size: 36px;
-      text-align: center;
-      color: #333;
-      margin-top: 50px;
-      margin-bottom: 30px;
-    }
-    label {
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-    }
-    input[type="text"] {
-      font-size: 20px;
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
-      width: 60%;
-      margin-right: 10px;
-    }
-    button {
-      font-size: 20px;
-      font-weight: bold;
-      padding: 10px 20px;
-      border-radius: 5px;
-      border: none;
-      background-color: #333;
-      color: #fff;
-    }
-    button:hover {
-      cursor: pointer;
-      background-color: #444;
-    }
-    #image-container {
-      margin-top: 30px;
-      text-align: center;
-    }
-    #image-container img {
-      max-width: 400px;
-      max-height: 400px;
-      width: auto;
-      height: auto;
-    }
+ <style>
+
+.image-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.image-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.image-container img {
+  max-width: 400px;
+  max-height: 400px;
+  width: auto;
+  height: auto;
+  margin: 10px;
+  border-radius: 5px;
+}
+
+.image-link a {
+  display: inline-block;
+  padding: 5px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 5px;
+  word-wrap: break-word;
+}
+
+.image-link a {
+  display: flex;
+  justify-content: center;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 0px 0px 5px 5px;
+  padding: 0;
+}
   </style>
 </head>
 <body>
+
   <h1>Image Search</h1>
   <label for="search-query">Search for an image:</label>
   <input type="text" id="search-query" onkeydown="if(event.keyCode==13) searchImages()">
-  <button onclick="searchImages()">Search</button>
-  <div id="image-container"></div>
+  <button id="search-button" onclick="searchImages()">Search</button>
+  <div class="image-container" id="image-container"></div>
+
+  <div class="image-container-wrapper">
+    <div class="image-container" id="image-container"></div>
+  </div>
 
   <script>
     function searchImages() {
@@ -69,12 +70,27 @@
       fetch(url)
         .then(response => response.json())
         .then(data => {
-          const image = data.items[0].link;
-          const imageContainer = document.getElementById('image-container');
-          imageContainer.innerHTML = `<img src="${image}" alt="${query}">`;
+          const images = data.items;
+          let imageContainer = document.getElementById('image-container');
+          imageContainer.innerHTML = '';
+          images.forEach(image => {
+            const link = image.link;
+            const snippet = image.title;
+            const img = `<a href="${link}" target="_blank"><img src="${image.image.thumbnailLink}" alt="${snippet}"></a>`;
+            const imgLink = `<p class="image-link"><a href="${link}" target="_blank">${snippet}</a></p>`;
+            imageContainer.innerHTML += `<div class="image-wrapper">${img}${imgLink}</div>`;
+          });
         })
         .catch(error => console.error(error));
     }
+
+    const input = document.getElementById("search-query");
+    input.addEventListener("keyup", function(event) {
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        document.getElementById("search-button").click();
+      }
+    });
   </script>
 </body>
 </html>
