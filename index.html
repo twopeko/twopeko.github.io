@@ -49,36 +49,70 @@
   </style>
 </head>
 <body>
-
   <h1>Image Search</h1>
   <label for="search-query">Search for an image:</label>
   <input type="text" id="search-query" onkeydown="if(event.keyCode==13) searchImages()">
   <button id="search-button" onclick="searchImages()">Search</button>
-  <div class="image-container" id="image-container"></div>
 
   <div class="image-container-wrapper">
     <div class="image-container" id="image-container"></div>
+    <button id="load-more-button" onclick="loadMore()">Load More</button>
   </div>
 
   <script>
+    let query = '';
+    let seenImages = [];
+    let nextPageToken = '';
+
     function searchImages() {
-      const query = document.getElementById('search-query').value;
-      const apiKey = 'AIzaSyDYZKa0WVjGQLK0OYjE6vxtqrgufHyHmCg';
-      const cx = '517a5defcdd94428d';
-      const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${query}&searchType=image`;
+      query = document.getElementById('search-query').value;
+      const apiKey = 'AIzaSyBgnRE0-xmFTbj41MNl5vL95NecQtEMDaU';
+      const cx = 'd3a26dfa37f5d4b47';
+      const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${query}&searchType=image&num=10`;
 
       fetch(url)
         .then(response => response.json())
         .then(data => {
+          nextPageToken = data.queries.nextPage[0].startIndex;
           const images = data.items;
           let imageContainer = document.getElementById('image-container');
           imageContainer.innerHTML = '';
           images.forEach(image => {
             const link = image.link;
             const snippet = image.title;
-            const img = `<a href="${link}" target="_blank"><img src="${image.image.thumbnailLink}" alt="${snippet}"></a>`;
-            const imgLink = `<p class="image-link"><a href="${link}" target="_blank">${snippet}</a></p>`;
-            imageContainer.innerHTML += `<div class="image-wrapper">${img}${imgLink}</div>`;
+            const imgSrc = image.image.thumbnailLink;
+            const img = `<a href="${link}" target="_blank"><img src="${imgSrc}" alt="${snippet}"></a>`;
+            const imgLink = `<p class="image-link"><a href="${link}" target="_blank">${snippet}</a> - <a href="${link}" target="_blank">View Image</a></p>`;
+            if (seenImages.indexOf(imgSrc) === -1) {
+              seenImages.push(imgSrc);
+              imageContainer.innerHTML += `<div class="image-wrapper">${img}${imgLink}</div>`;
+            }
+          });
+        })
+        .catch(error => console.error(error));
+    }
+
+    function loadMore() {
+      const apiKey = 'AIzaSyBgnRE0-xmFTbj41MNl5vL95NecQtEMDaU';
+      const cx = 'd3a26dfa37f5d4b47';
+      const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${query}&searchType=image&num=10&start=${nextPageToken}`;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          nextPageToken = data.queries.nextPage[0].startIndex;
+          const images = data.items;
+          let imageContainer = document.getElementById('image-container');
+          images.forEach(image => {
+            const link = image.link;
+            const snippet = image.title;
+            const imgSrc = image.image.thumbnailLink;
+            const img = `<a href="${link}" target="_blank"><img src="${imgSrc}" alt="${snippet}"></a>`;
+            const imgLink = `<p class="image-link"><a href="${link}" target="_blank">${snippet}</a> - <a href="${link}" target="_blank">View Image</a></p>`;
+            if (seenImages.indexOf(imgSrc) === -1) {
+              seenImages.push(imgSrc);
+              imageContainer.innerHTML += `<div class="image-wrapper">${img}${imgLink}</div>`;
+            }
           });
         })
         .catch(error => console.error(error));
