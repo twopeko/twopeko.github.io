@@ -3,26 +3,63 @@
 <head>
   <title>Image Search</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      font-size: 36px;
+      text-align: center;
+      color: #333;
+      margin-top: 50px;
+      margin-bottom: 30px;
+    }
+    label {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+    input[type="text"] {
+      font-size: 20px;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      width: 60%;
+      margin-right: 10px;
+    }
+    button {
+      font-size: 20px;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      background-color: #333;
+      color: #fff;
+    }
+    button:hover {
+      cursor: pointer;
+      background-color: #444;
+    }
     #image-container {
-      margin-top: 20px;
-      border-top: 1px solid #ccc;
-      padding-top: 20px;
+      margin-top: 30px;
+      text-align: center;
+    }
+    #image-container img {
+      max-width: 400px;
+      max-height: 400px;
+      width: auto;
+      height: auto;
     }
   </style>
 </head>
 <body>
   <h1>Image Search</h1>
-  <input type="text" id="search-query" onkeyup="searchOnEnter(event)">
+  <label for="search-query">Search for an image:</label>
+  <input type="text" id="search-query" onkeydown="if(event.keyCode==13) searchImages()">
   <button onclick="searchImages()">Search</button>
   <div id="image-container"></div>
 
   <script>
-    function searchOnEnter(event) {
-      if (event.keyCode === 13) {
-        searchImages();
-      }
-    }
-
     function searchImages() {
       const query = document.getElementById('search-query').value;
       const apiKey = 'AIzaSyDYZKa0WVjGQLK0OYjE6vxtqrgufHyHmCg';
@@ -34,7 +71,7 @@
         .then(data => {
           const image = data.items[0].link;
           const imageContainer = document.getElementById('image-container');
-          imageContainer.innerHTML = `<img src="${image}" style="max-width: 100%; max-height: 500px;">`;
+          imageContainer.innerHTML = `<img src="${image}" alt="${query}">`;
         })
         .catch(error => console.error(error));
     }
